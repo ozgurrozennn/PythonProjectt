@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from io import BytesIO
-import streamlit
+import  openpyxl
 #Başlık ekliyoruz. Stream importu için st.(title)
 st.title(" Gelir Vergisi Hesaplama ")
 
@@ -84,4 +84,5 @@ if st.button("Vergiyi Hesapla"):
         file_name="gelir_vergisi.xlsx",             #dosya adı
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"    #Bilgisayara excel formatıdır diye komut veriyoruz.
     )
+
 
