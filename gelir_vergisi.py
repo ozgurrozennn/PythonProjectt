@@ -31,13 +31,13 @@ def hesapla_vergi_ve_net(matrah_aylik, gelir_unsuru):
             vergi+=vergi_toplam
         elif yillik_matrah <= 1_200_000:
             vergi = 58_100 + 0.27 * (yillik_matrah - 330_000)  
-             vergi+=vergi_toplam
+            vergi+=vergi_toplam
         elif yillik_matrah <= 4_300_000:
             vergi = 293_000 + 0.35 * (yillik_matrah - 1_200_000)
-             vergi+=vergi_toplam
+            vergi+=vergi_toplam
         else:
             vergi = 1_378_000 + 0.40 * (yillik_matrah - 4_300_000)
-             vergi+=vergi_toplam
+            vergi+=vergi_toplam
     
    
     net_yillik = yillik_matrah - vergi  #net yıllık gelir için örnek(33_000 X 12)=396_000=320_080
@@ -78,6 +78,7 @@ if st.button("Vergiyi Hesapla"):
 
     st.subheader("Sonuc:")#altbaslık metodu ıcın st.subheader
     st.table(df)    # Streamda tablo ile göstermek içindir
+
 
 
 
