@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 from io import BytesIO
-import  openpyxl
+
+
 #Başlık ekliyoruz. Stream importu için st.(title)
 st.title(" Gelir Vergisi Hesaplama ")
 
@@ -43,7 +44,7 @@ def hesapla_vergi_ve_net(matrah_aylik, gelir_unsuru):
     net_yillik = yillik_matrah - vergi  #net yıllık gelir için örnek(33_000 X 12)=396_000=320_080
     net_aylik = (net_yillik / 12) if gelir_unsuru == "Ücretli" else None
     #ücretli için net ayliği bulmak (net yıllık/12) 320_080/12= 26_673 net_aylik
-    tahakkuk_vergi=matrah_aylik-net_aylik   # 33.000 - 26.673= 6.326
+    tahakkuk_vergi=(matrah_aylik-net_aylik)if net_aylik is not None else None   # 33.000 - 26.673= 6.326
     return yillik_matrah, vergi, net_yillik, net_aylik,tahakkuk_vergi
     # def ile oluşturduğum variable yani fonksiyonları return ile geri çağırıyorum
 
@@ -70,19 +71,6 @@ if st.button("Vergiyi Hesapla"):
 
     })
 
-
+    st.subheader("Sonuc:")
     st.table(df)    # Streamda tablo ile göstermek içindir
-
-
-
-    output = BytesIO()  # Ramde bellekte hafızada tutar , Import bytesIO ile çağırılıe
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:   #excele yazıdrma islemi
-        df.to_excel(writer, index=False, sheet_name="Gelir_Vergisi")    # pandasdaki data frame yazdırma eğer satırlarıda isteseniz index=True yapmanız gerekir
-    st.download_button(             #Streamdaki indirme butonu oluşsturma metodudur.
-        label="Excel Olarak İndir",         # label oluşturma ve içine Excel olarak indir yazılmıştır
-        data=output.getvalue(),             #streamde indirme işlem için kullanılır
-        file_name="gelir_vergisi.xlsx",             #dosya adı
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"    #Bilgisayara excel formatıdır diye komut veriyoruz.
-    )
-
 
