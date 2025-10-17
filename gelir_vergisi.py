@@ -44,7 +44,7 @@ def hesapla_vergi_ve_net(matrah_aylik, gelir_unsuru):
             float(f"{net_yillik:.2f}"),
             float(f"{net_aylik:.2f}"),
             float(f"{tahakkuk_vergi:.2f}")
-
+           )
 
 if st.button("Vergiyi Hesapla"):
     yillik_matrah, vergi, net_yillik, net_aylik,tahakkuk_vergi = hesapla_vergi_ve_net(matrah_aylik, gelir_unsuru)
@@ -72,6 +72,7 @@ if st.button("Vergiyi Hesapla"):
 
     st.subheader("Sonuc:")#altbaslık metodu ıcın st.subheader
     st.table(df)    # Streamda tablo ile göstermek içindir
+
 
 
 
