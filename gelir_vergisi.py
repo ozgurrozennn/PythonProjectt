@@ -41,7 +41,7 @@ def hesapla_vergi_ve_net(matrah_aylik, gelir_unsuru):
     # def ile oluşturduğum variable yani fonksiyonları return ile geri çağırıyorum
     return (float(f"{yillik_matrah:.2f}"),
             float(f"{vergi:}"),
-            float(f"{net_yillik:,.2f}"),
+            float(f"{net_yillik:.2f}"),
             float(f"{net_aylik:.2f}"),
             float(f"{tahakkuk_vergi:.2f}")
            )
@@ -60,18 +60,19 @@ if st.button("Vergiyi Hesapla"):
     # Aşağıdaki mantıkla sütunları doldururz
     df = pd.DataFrame({
         "Gelir Unsuru": [gelir_unsuru],  # Bu genellikle string, float yapmaya gerek yok
-    "Aylık Brüt Gelir (₺)": [float(matrah_aylik), 2)],
-    "Yıllık Matrah (₺)": [float(yillik_matrah), 2)],
-    "Yıllık Vergi (₺)": [float(vergi), 2],
-    "Tahakkuk Eden Vergi (₺)": [float(tahakkuk_vergi), 2)],
-    "Net Yıllık Gelir (₺)": [float(net_yillik), 2)],
-    "Net Aylık Gelir (₺)": [float(net_aylik), 2)]
+    "Aylık Brüt Gelir (₺)": [matrah_aylik))],
+    "Yıllık Matrah (₺)": [(yillik_matrah))],
+    "Yıllık Vergi (₺)": [(vergi)],
+    "Tahakkuk Eden Vergi (₺)": [(tahakkuk_vergi))],
+    "Net Yıllık Gelir (₺)": [(net_yillik))],
+    "Net Aylık Gelir (₺)": [(net_aylik)]
 })
 
 
 
     st.subheader("Sonuc:")#altbaslık metodu ıcın st.subheader
     st.table(df)    # Streamda tablo ile göstermek içindir
+
 
 
 
