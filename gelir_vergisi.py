@@ -28,16 +28,16 @@ def hesapla_vergi_ve_net(matrah_aylik, gelir_unsuru):
         yillik_matrah = matrah_aylik    # ücret dışı secmişs se çarpma işlemi yapılmaz Ücret dışını yıllık al direk 396.000
 
 
-    if yillik_matrah <= 158_000:    #Eğer Yıllık Matrah 158000 eşit veya daha az ise
-        vergi = yillik_matrah * 0.15 #vergi varaible olusturduk örnek:10_000 X 12 // yillık=(120_000 X 0.15)= 18_000. Yıllık  vergi
-    elif yillik_matrah <= 330_000:  # Yıllık Matrah 330000 eşit veya daaha az ise
-        vergi = 23_700 + (yillik_matrah - 158_000) * 0.20# Örnek: 22_000 X 12// yillik=(264_000-158_000)*0.20 + (23700)= 44.900 Yıllık vergi
-    elif yillik_matrah <= 800_000:  #Yıllık matrah 800 bin eşit ve daha az ise
-        vergi = 58_100 + (yillik_matrah - 330_000) * 0.27    # Örnek: 33_000 x 12 // yillık=(396_000-330_000)*0.27 +(58_100)=75_920 Yıllık Vergi
-    elif yillik_matrah <= 4_300_000:    #Yıllık matrah 4milyon 300 bine eşit  veya daha az ise
-        vergi = 185_000 + (yillik_matrah - 800_000) * 0.35  # 67_000 x 12=804.000 yıllık matrah //(804_000-800_000)*0.35 +(185.000)=186_400 Yıllık Vergi
-    else:
-        vergi = 1_410_000 + (yillik_matrah - 4_300_000) * 0.40  # 359_000 X 12=4_308_000 yıllık matrah // (4_308_000-4_300_000)*0.40+1_410_000=1_413_200
+        if yillik_matrah <= 158_000:
+            vergi = yillik_matrah * 0.15
+        elif yillik_matrah <= 330_000:
+            vergi = 158_000 * 0.15 + yillik_matrah-158.000*0.20
+        elif yillik_matrah <= 1_200_000:
+            vergi = 158_000 * 0.15 + 172_000 * 0.20 + yillik_matrah - 330_000 * 0.27
+        elif yillik_matrah <= 4_300_000:
+            vergi = 158_000 * 0.15 + 172_000 * 0.20 + 870_000 * 0.27 + yillik_matrah - 1_200_000 * 0.35
+        else:
+            vergi = 158_000 * 0.15 + 172_000 * 0.20 + 870_000 * 0.27 + 3_100_000 * 0.35 + yillik_matrah - 4_300_000 * 0.40
 
     net_yillik = yillik_matrah - vergi  #net yıllık gelir için örnek(33_000 X 12)=396_000=320_080
     net_aylik = (net_yillik / 12) if gelir_unsuru == "Ücretli" else None
@@ -85,6 +85,7 @@ if st.button("Vergiyi Hesapla"):
 
     st.subheader("Sonuc:")#altbaslık metodu ıcın st.subheader
     st.table(df)    # Streamda tablo ile göstermek içindir
+
 
 
 
