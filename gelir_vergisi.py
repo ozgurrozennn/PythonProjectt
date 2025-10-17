@@ -40,7 +40,7 @@ def hesapla_vergi_ve_net(matrah_aylik, gelir_unsuru):
     tahakkuk_vergi=(matrah_aylik-net_aylik)if net_aylik is not None else None   # 33.000 - 26.673= 6.326
     # def ile oluşturduğum variable yani fonksiyonları return ile geri çağırıyorum
     return (float(f"{yillik_matrah:.2f}"),
-            float(f"{vergi+2400:.2f}"),
+            float(f"{vergi:+2400}"),
             float(f"{net_yillik:.2f}"),
             float(f"{net_aylik:.2f}"),
             float(f"{tahakkuk_vergi:.2f}")
@@ -72,6 +72,7 @@ if st.button("Vergiyi Hesapla"):
 
     st.subheader("Sonuc:")#altbaslık metodu ıcın st.subheader
     st.table(df)    # Streamda tablo ile göstermek içindir
+
 
 
 
