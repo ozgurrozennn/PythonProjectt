@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 
-
 #Başlık ekliyoruz. Stream importu için st.(title)
 st.title(" Gelir Vergisi Hesaplama ")
 
@@ -18,8 +17,8 @@ matrah_aylik = st.number_input(
 
 
 )
-if (matrah_aylik) < (1000):         #eğer streamda ondalık hatasını almamak için misal 5000 yerine 500 girdiyse bin ile çarp 5000 eder
-    (matrah_aylik) = (matrah_aylik * 1000)
+if 0<matrah_aylik <=1000:#misal burda 1000 ve aşağısını 1000 sabitledik misal 90 da yazsa 1000den hesaplamasını istedik.
+    matrah_aylik = 1000# = atama operatoruyle 1000 sabitledik
 
 # def metoduyla oluşturduk, matrah_aylik, gelir_unsuru fonksiyonlarını çağırdık
 def hesapla_vergi_ve_net(matrah_aylik, gelir_unsuru):
@@ -47,11 +46,25 @@ def hesapla_vergi_ve_net(matrah_aylik, gelir_unsuru):
     return yillik_matrah, vergi, net_yillik, net_aylik,tahakkuk_vergi
     # def ile oluşturduğum variable yani fonksiyonları return ile geri çağırıyorum
 
+def format_sayi(sayi):# Misal burda da sayı atadık ki ondalık hatasını engelledik
+        if sayi is None:# Eğer sayı none değeri verirse
+            return "-"
+        elif sayi.is_integer():# sayının yanı float degerindeki sayınının tam sayı olup olmadığını kontrol eder
+            return f"{int(sayi):,}".replace(",", ".")
+            # 360.00 floattır ama bu metota göre tam sayıdır ancak 360.05 float sayısıdır.
+            # virgül koyulursa nokta olarak işleme almak için replace metodu kullanılmıştır.
+        else:
+            return f"{sayi:,.2f}".replace(",", ".")  # misal ondalıklı sayı cıkarsa son iki rakamını al ve virgül ise noktaya çevir
+
+
+
 
 if st.button("Vergiyi Hesapla"):
     yillik_matrah, vergi, net_yillik, net_aylik,tahakkuk_vergi = hesapla_vergi_ve_net(matrah_aylik, gelir_unsuru)
     #st button iste bu işlemi gerçekleştirmek için oluşturulan kutucuk metodudur.
     # Gördüğünüz gibi yukarıdaki return ile çağırdım fonkz"iyonları bu butonun içine atıyorum.
+
+
 
   #Data_Frame denilen olay veriyi tablo haline çevirmedir.
     #import pandas as pd ile çekeriz
@@ -60,17 +73,18 @@ if st.button("Vergiyi Hesapla"):
     # Aşağıdaki mantıkla sütunları doldururz
     df = pd.DataFrame({
         "Gelir Unsuru": [gelir_unsuru],
-        "Aylık Brüt Gelir (₺)": [matrah_aylik],
-        "Yıllık Matrah (₺)": [yillik_matrah],
-        "Yıllık Vergi (₺)": [vergi],
-        "Tahakkuk Eden Vergi":[tahakkuk_vergi],
-    "Net Yıllık Gelir (₺)": [net_yillik],
-        "Net Aylık Gelir (₺)": [net_aylik if net_aylik else 0]
+        "Aylık Brüt Gelir (₺)": [format_sayi(matrah_aylik)],# burada format eklemeyı unutmuyoruz yoksa liste de ondalıklı verir.
+        "Yıllık Matrah (₺)": [format_sayi(yillik_matrah)],## burada format eklemeyı unutmuyoruz yoksa liste de ondalıklı verir.
+        "Yıllık Vergi (₺)": [format_sayi(vergi)],## burada format eklemeyı unutmuyoruz yoksa liste de ondalıklı verir.
+        "Tahakkuk Eden Vergi":[format_sayi(tahakkuk_vergi)],## burada format eklemeyı unutmuyoruz yoksa liste de ondalıklı verir.
+    "Net Yıllık Gelir (₺)": [format_sayi(net_yillik)],## burada format eklemeyı unutmuyoruz yoksa liste de ondalıklı verir.
+        "Net Aylık Gelir (₺)": [format_sayi(net_aylik)]## burada format eklemeyı unutmuyoruz yoksa liste de ondalıklı verir.
         #Burda else sıfr mantığı if koşulda net aylık yoksa ücret dışı için geçerlidir bu nedenle else sıfır mantığını uyguladık
 
     })
 
-    st.subheader("Sonuc:")
+    st.subheader("Sonuc:")#altbaslık metodu ıcın st.subheader
     st.table(df)    # Streamda tablo ile göstermek içindir
+
 
 
