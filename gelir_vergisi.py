@@ -79,12 +79,13 @@ if st.button("Vergiyi Hesapla"):
         "Tahakkuk Eden Vergi":[format_sayi(tahakkuk_vergi)],## burada format eklemeyı unutmuyoruz yoksa liste de ondalıklı verir.
     "Net Yıllık Gelir (₺)": [format_sayi(net_yillik)],## burada format eklemeyı unutmuyoruz yoksa liste de ondalıklı verir.
         "Net Aylık Gelir (₺)": [format_sayi(net_aylik)]## burada format eklemeyı unutmuyoruz yoksa liste de ondalıklı verir.
-        #Burda else sıfr mantığı if koşulda net aylık yoksa ücret dışı için geçerlidir bu nedenle else sıfır mantığını uyguladık
+        
 
     })
 
     st.subheader("Sonuc:")#altbaslık metodu ıcın st.subheader
     st.table(df)    # Streamda tablo ile göstermek içindir
+
 
 
 
