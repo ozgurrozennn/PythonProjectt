@@ -68,10 +68,11 @@ if st.button("Vergiyi Hesapla"):
     "Net Aylık Gelir (₺)": [round(float(net_aylik), 2)]
 })
 
-    })
+
 
     st.subheader("Sonuc:")#altbaslık metodu ıcın st.subheader
     st.table(df)    # Streamda tablo ile göstermek içindir
+
 
 
 
