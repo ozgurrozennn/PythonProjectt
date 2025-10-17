@@ -27,21 +27,22 @@ def hesapla_vergi_ve_net(matrah_aylik, gelir_unsuru):
             vergi = yillik_matrah * 0.15
         elif yillik_matrah <= 330_000:# Eğer yıllık matrah 158.000<yıllık_matrah<=330_000 ise demektir bu kosul . misal (15_000*12)=180_000(180_000-158_00)*0.20 +23_700
             vergi = 23_700 + 0.20 * (yillik_matrah - 158_000) 
-            vergi+=2400
+           
         elif yillik_matrah <= 1_200_000:
             vergi = 58_100 + 0.27 * (yillik_matrah - 330_000)  
         elif yillik_matrah <= 4_300_000:
             vergi = 293_000 + 0.35 * (yillik_matrah - 1_200_000)
         else:
             vergi = 1_378_000 + 0.40 * (yillik_matrah - 4_300_000)
-
+    
+    vergi_sonuc=vergi*2.07
     net_yillik = yillik_matrah - vergi  #net yıllık gelir için örnek(33_000 X 12)=396_000=320_080
     net_aylik = (net_yillik / 12) if gelir_unsuru == "Ücretli" else None
     #ücretli için net ayliği bulmak (net yıllık/12) 320_080/12= 26_673 net_aylik
     tahakkuk_vergi=(matrah_aylik-net_aylik)if net_aylik is not None else None   # 33.000 - 26.673= 6.326
     # def ile oluşturduğum variable yani fonksiyonları return ile geri çağırıyorum
     return (float(f"{yillik_matrah:.2f}"),
-            float(f"{vergi:.2f}"),
+            float(f"{vergi_sonuc:.2f}"),
             float(f"{net_yillik:.2f}"),
             float(f"{net_aylik:.2f}"),
             float(f"{tahakkuk_vergi:.2f}")
@@ -73,6 +74,7 @@ if st.button("Vergiyi Hesapla"):
 
     st.subheader("Sonuc:")#altbaslık metodu ıcın st.subheader
     st.table(df)    # Streamda tablo ile göstermek içindir
+
 
 
 
