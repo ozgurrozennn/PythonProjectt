@@ -13,13 +13,12 @@ matrah_aylik = st.number_input(
     "Aylık Brüt Gelir (TL)",
     min_value=0.0, #Minimum Girilecek Değer
     value=20000.0,#Box daki değer
-    step=500,0 # Sayı arttırmak için kullanılacak değerdir.
-    vergi_toplam=2400
+    step=500.0 # Sayı arttırmak için kullanılacak değerdir.
+   
 
 
 )
-
-
+ vergi_toplam=2400
 # def metoduyla oluşturduk, matrah_aylik, gelir_unsuru fonksiyonlarını çağırdık
 def hesapla_vergi_ve_net(matrah_aylik, gelir_unsuru):
     if gelir_unsuru == "Ücretli":
@@ -79,6 +78,7 @@ if st.button("Vergiyi Hesapla"):
 
     st.subheader("Sonuc:")#altbaslık metodu ıcın st.subheader
     st.table(df)    # Streamda tablo ile göstermek içindir
+
 
 
 
