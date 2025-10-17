@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-from io import BytesIO
 
 
 #Başlık ekliyoruz. Stream importu için st.(title)
@@ -73,4 +72,5 @@ if st.button("Vergiyi Hesapla"):
 
     st.subheader("Sonuc:")
     st.table(df)    # Streamda tablo ile göstermek içindir
+
 
