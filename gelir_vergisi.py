@@ -62,7 +62,7 @@ if st.button("Vergiyi Hesapla"):
         "Gelir Unsuru": [gelir_unsuru],  # Bu genellikle string, float yapmaya gerek yok
     "Aylık Brüt Gelir (₺)": [round(float(matrah_aylik), 2)],
     "Yıllık Matrah (₺)": [round(float(yillik_matrah), 2)],
-    "Yıllık Vergi (₺)": [round(float(vergi))],
+    "Yıllık Vergi (₺)": [floar(vergi), 2],
     "Tahakkuk Eden Vergi (₺)": [round(float(tahakkuk_vergi), 2)],
     "Net Yıllık Gelir (₺)": [round(float(net_yillik), 2)],
     "Net Aylık Gelir (₺)": [round(float(net_aylik), 2)]
@@ -72,6 +72,7 @@ if st.button("Vergiyi Hesapla"):
 
     st.subheader("Sonuc:")#altbaslık metodu ıcın st.subheader
     st.table(df)    # Streamda tablo ile göstermek içindir
+
 
 
 
