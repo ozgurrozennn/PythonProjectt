@@ -26,7 +26,7 @@ def hesapla_vergi_ve_net(matrah_aylik, gelir_unsuru):
         if yillik_matrah <= 158_000: # Eğer yıllık matrah 158 ve 158 000 altındaysa örnek :  (12_000 x12_000=144_000) yıllık matrah= 144_000*0.15=21_600 yıllık vergi
             vergi = yillik_matrah * 0.15
         elif yillik_matrah <= 330_000:# Eğer yıllık matrah 158.000<yıllık_matrah<=330_000 ise demektir bu kosul . misal (15_000*12)=180_000(180_000-158_00)*0.20 +23_700
-            vergi = 23_700 + 0.20 * (yillik_matrah - 158_000) +2_400
+            vergi = 23_700 + 0.20 * (yillik_matrah - 158_000) 
         elif yillik_matrah <= 1_200_000:
             vergi = 58_100 + 0.27 * (yillik_matrah - 330_000)  
         elif yillik_matrah <= 4_300_000:
@@ -40,7 +40,7 @@ def hesapla_vergi_ve_net(matrah_aylik, gelir_unsuru):
     tahakkuk_vergi=(matrah_aylik-net_aylik)if net_aylik is not None else None   # 33.000 - 26.673= 6.326
     # def ile oluşturduğum variable yani fonksiyonları return ile geri çağırıyorum
     return (float(f"{yillik_matrah:.2f}"),
-            float(f"{vergi:}"),
+            float(f"{vergi:.2f}"),
             float(f"{net_yillik:.2f}"),
             float(f"{net_aylik:.2f}"),
             float(f"{tahakkuk_vergi:.2f}")
@@ -72,6 +72,7 @@ if st.button("Vergiyi Hesapla"):
 
     st.subheader("Sonuc:")#altbaslık metodu ıcın st.subheader
     st.table(df)    # Streamda tablo ile göstermek içindir
+
 
 
 
