@@ -59,19 +59,20 @@ if st.button("Vergiyi Hesapla"):
     #satırlar (rows) diye adlandırılır.
     # Aşağıdaki mantıkla sütunları doldururz
     df = pd.DataFrame({
-        "Gelir Unsuru": [gelir_unsuru],
-        "Aylık Brüt Gelir (₺)": [float(matrah_aylik:)],
-        "Yıllık Matrah (₺)": [(yillik_matrah)],
-        "Yıllık Vergi (₺)": [float(vergi:.2f)],
-        "Tahakkuk Eden Vergi(₺)":[(tahakkuk_vergi)],
-    "Net Yıllık Gelir (₺)": [(net_yillik)],
-        "Net Aylık Gelir (₺)": [(net_aylik)]
-        
+        "Gelir Unsuru": [gelir_unsuru],  # Bu genellikle string, float yapmaya gerek yok
+    "Aylık Brüt Gelir (₺)": [round(float(matrah_aylik), 2)],
+    "Yıllık Matrah (₺)": [round(float(yillik_matrah), 2)],
+    "Yıllık Vergi (₺)": [round(float(vergi), 2)],
+    "Tahakkuk Eden Vergi (₺)": [round(float(tahakkuk_vergi), 2)],
+    "Net Yıllık Gelir (₺)": [round(float(net_yillik), 2)],
+    "Net Aylık Gelir (₺)": [round(float(net_aylik), 2)]
+})
 
     })
 
     st.subheader("Sonuc:")#altbaslık metodu ıcın st.subheader
     st.table(df)    # Streamda tablo ile göstermek içindir
+
 
 
 
