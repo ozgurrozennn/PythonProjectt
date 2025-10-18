@@ -23,7 +23,7 @@ vergi_toplam=2400
 def hesapla_vergi_ve_net(matrah_aylik, gelir_unsuru):
     if gelir_unsuru == "Ücretli":
         yillik_matrah = matrah_aylik * 12 # Burada yıllık matrahı buluyoruz
-        if yillik_matrah <= 158_000: # Eğer yıllık matrah 158 ve 158 000 altındaysa örnek :  (12_000 x12_000=144_000) yıllık matrah= 144_000*0.15=21_600 yıllık vergi
+        if yillik_matrah <= 158_000: 
             vergi = yillik_matrah * 0.15
            
         elif yillik_matrah <= 330_000:# Eğer yıllık matrah 158.000<yıllık_matrah<=330_000 ise demektir bu kosul . misal (15_000*12)=180_000(180_000-158_00)*0.20 +23_700
@@ -78,6 +78,7 @@ if st.button("Vergiyi Hesapla"):
 
     st.subheader("Sonuc:")#altbaslık metodu ıcın st.subheader
     st.table(df)    # Streamda tablo ile göstermek içindir
+
 
 
 
