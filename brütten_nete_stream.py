@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-st.title("Maaş Hesaplama")
+st.title("Bordro Hesaplama")
 
 # Girişler
 brüt_ücret = st.number_input("Brüt Ücret (TL)")
@@ -96,5 +96,6 @@ if hesapla_btn:
         }),
 
     )
+
 
     st.write(f"**Yıllık Toplam Net Ücret:** {toplam_net:,.2f} ₺")
