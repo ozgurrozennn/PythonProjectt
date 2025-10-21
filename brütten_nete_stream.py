@@ -6,11 +6,32 @@ st.title("Bordro Hesaplama")
 # Girişler
 brüt_ücret = st.number_input("Brüt Ücret (TL)")
 
-bordro = True
+bordro = st.checkbox("Bordro ", )
 
 hesapla_btn = st.button(" Hesapla")
 
-if hesapla_btn:
+if hesapla_btn and brüt_ücret > 0:
+    # 2025 Asgari Ücret
+    asgari_ucret_brut = 26_005.50
+
+    # Asgari ücret kesintileri
+    asgari_sgk = asgari_ucret_brut * 0.14
+    asgari_issizlik = asgari_ucret_brut * 0.01
+    asgari_damga_vergisi = asgari_ucret_brut * 0.00759
+
+    # Asgari ücret gelir matrahı
+    asgari_gelir_matrahi = asgari_ucret_brut - (asgari_sgk + asgari_issizlik)
+
+    # Asgari ücret gelir vergisi (ilk dilim %15)
+    asgari_gelir_vergisi = asgari_gelir_matrahi * 0.15
+
+    # Asgari ücret net hesaplama
+    asgari_net = asgari_ucret_brut - (asgari_sgk + asgari_issizlik + asgari_gelir_vergisi + asgari_damga_vergisi)
+
+    # İstisnalar
+    asgari_ucret_gelir_vergisi_istisnasi = asgari_gelir_vergisi
+    asgari_ucret_damga_vergisi_istisnasi = asgari_damga_vergisi
+
     # Sabit oranlar
     sgk_oranı = 0.14
     işsizlik_sigorta_primi = 0.01
@@ -27,7 +48,7 @@ if hesapla_btn:
     # Kesintiler
     sgk_işçi = brüt_ücret * sgk_oranı
     işsizlik_işçi = brüt_ücret * işsizlik_sigorta_primi
-    damga_vergisi_oranı = brüt_ücret * damga_vergisi
+    damga_vergisi_tutarı = brüt_ücret * damga_vergisi
     gelir_matrahı = brüt_ücret - (sgk_işçi + işsizlik_işçi)
 
     # Hesaplamalar
@@ -68,8 +89,15 @@ if hesapla_btn:
         else:
             aylık_gelir_vergisi = kümülatif_vergi - toplam_vergi
 
+        # İstisna uygulaması
+        gelir_vergisi_istisna_sonrası = max(0, aylık_gelir_vergisi - asgari_ucret_gelir_vergisi_istisnasi)
+        damga_vergisi_istisna_sonrası = max(0, damga_vergisi_tutarı - asgari_ucret_damga_vergisi_istisnasi)
+
         toplam_vergi = kümülatif_vergi
-        aylık_net = brüt_ücret - (sgk_işçi + işsizlik_işçi + aylık_gelir_vergisi + damga_vergisi_oranı)
+
+        # Net ücret hesaplama
+        aylık_net = brüt_ücret - (
+                    sgk_işçi + işsizlik_işçi + gelir_vergisi_istisna_sonrası + damga_vergisi_istisna_sonrası)
         toplam_net += aylık_net
 
         sonuclar.append({
@@ -77,10 +105,15 @@ if hesapla_btn:
             'Brüt Ücret': brüt_ücret,
             'SGK': sgk_işçi,
             'İşsizlik': işsizlik_işçi,
-            'Damga Vergisi': damga_vergisi_oranı,
             'Gelir Vergisi': aylık_gelir_vergisi,
+            'GV İstisnası': asgari_ucret_gelir_vergisi_istisnasi,
+            'Ödenecek GV': gelir_vergisi_istisna_sonrası,
+            'Damga Vergisi': damga_vergisi_tutarı,
+            'DV İstisnası': asgari_ucret_damga_vergisi_istisnasi,
+            'Ödenecek DV': damga_vergisi_istisna_sonrası,
             'Net Ücret': aylık_net
         })
+
 
     # Sonuçları göster
     df = pd.DataFrame(sonuclar)
@@ -90,12 +123,14 @@ if hesapla_btn:
             'Brüt Ücret': '{:,.2f} ₺',
             'SGK': '{:,.2f} ₺',
             'İşsizlik': '{:,.2f} ₺',
-            'Damga Vergisi': '{:,.2f} ₺',
             'Gelir Vergisi': '{:,.2f} ₺',
+            'GV İstisnası': '{:,.2f} ₺',
+            'Ödenecek GV': '{:,.2f} ₺',
+            'Damga Vergisi': '{:,.2f} ₺',
+            'DV İstisnası': '{:,.2f} ₺',
+            'Ödenecek DV': '{:,.2f} ₺',
             'Net Ücret': '{:,.2f} ₺'
         }),
 
     )
 
-
-    st.write(f"**Yıllık Toplam Net Ücret:** {toplam_net:,.2f} ₺")
