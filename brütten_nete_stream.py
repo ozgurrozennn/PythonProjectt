@@ -1,5 +1,15 @@
 import streamlit as st
 import pandas as pd
+from io import BytesIO
+
+# Toolbar'ı gizle
+st.markdown("""
+    <style>
+    [data-testid="stElementToolbar"] {
+        display: none;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 st.title("Bordro Hesaplama")
 
@@ -97,7 +107,7 @@ if hesapla_btn and brüt_ücret > 0:
 
         # Net ücret hesaplama
         aylık_net = brüt_ücret - (
-                    sgk_işçi + işsizlik_işçi + gelir_vergisi_istisna_sonrası + damga_vergisi_istisna_sonrası)
+                sgk_işçi + işsizlik_işçi + gelir_vergisi_istisna_sonrası + damga_vergisi_istisna_sonrası)
         toplam_net += aylık_net
 
         sonuclar.append({
@@ -114,23 +124,66 @@ if hesapla_btn and brüt_ücret > 0:
             'Net Ücret': aylık_net
         })
 
-
     # Sonuçları göster
     df = pd.DataFrame(sonuclar)
 
-    st.dataframe(
-        df.style.format({
-            'Brüt Ücret': '{:,.2f} ₺',
-            'SGK': '{:,.2f} ₺',
-            'İşsizlik': '{:,.2f} ₺',
-            'Gelir Vergisi': '{:,.2f} ₺',
-            'GV İstisnası': '{:,.2f} ₺',
-            'Ödenecek GV': '{:,.2f} ₺',
-            'Damga Vergisi': '{:,.2f} ₺',
-            'DV İstisnası': '{:,.2f} ₺',
-            'Ödenecek DV': '{:,.2f} ₺',
-            'Net Ücret': '{:,.2f} ₺'
-        }),
+    # Excel için sayıları formatlı string'e çevir
+    df_display = df.copy()
+    for col in ['Brüt Ücret', 'SGK', 'İşsizlik', 'Gelir Vergisi', 'GV İstisnası',
+                'Ödenecek GV', 'Damga Vergisi', 'DV İstisnası', 'Ödenecek DV', 'Net Ücret']:
+        df_display[col] = df[col].apply(lambda x: f'{x:,.2f} ₺')
 
+    # Sütun genişliklerini ayarla
+    st.dataframe(
+        df_display,
+        use_container_width=True,
+        hide_index=True,
+        height=500,
+        column_config={
+            "Ay": st.column_config.NumberColumn(width="small"),
+            "Brüt Ücret": st.column_config.TextColumn(width="small"),
+            "SGK": st.column_config.TextColumn(width="small"),
+            "İşsizlik": st.column_config.TextColumn(width="small"),
+            "Gelir Vergisi": st.column_config.TextColumn(width="small"),
+            "GV İstisnası": st.column_config.TextColumn(width="small"),
+            "Ödenecek GV": st.column_config.TextColumn(width="small"),
+            "Damga Vergisi": st.column_config.TextColumn(width="small"),
+            "DV İstisnası": st.column_config.TextColumn(width="small"),
+            "Ödenecek DV": st.column_config.TextColumn(width="small"),
+            "Net Ücret": st.column_config.TextColumn(width="small"),
+        }
+    )
+
+
+    # Excel indirme butonu
+    def to_excel(df):
+        output = BytesIO()
+        # Formatlanmış veriyi hazırla
+        df_excel = df.copy()
+        for col in ['Brüt Ücret', 'SGK', 'İşsizlik', 'Gelir Vergisi', 'GV İstisnası',
+                    'Ödenecek GV', 'Damga Vergisi', 'DV İstisnası', 'Ödenecek DV', 'Net Ücret']:
+            df_excel[col] = df[col].apply(lambda x: f'{x:,.2f}').str.replace(',', 'X').str.replace('.',
+                                                                                                   ',').str.replace('X',
+                                                                                                                    '.') + ' ₺'
+
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df_excel.to_excel(writer, index=False, sheet_name='Bordro')
+
+            # Sütun genişliklerini ayarla
+            worksheet = writer.sheets['Bordro']
+            worksheet.column_dimensions['A'].width = 8
+            for col in ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']:
+                worksheet.column_dimensions[col].width = 18
+
+        return output.getvalue()
+
+
+    excel_data = to_excel(df)
+
+    st.download_button(
+        label=" Excel İndir",
+        data=excel_data,
+        file_name=f"bordro_hesaplama_{brüt_ücret:.0f}TL.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
