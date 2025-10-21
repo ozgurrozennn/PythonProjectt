@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 
-# Toolbar'ı gizle
 st.markdown("""
     <style>
     [data-testid="stElementToolbar"] {
@@ -31,22 +30,22 @@ if hesapla_btn and brüt_ücret > 0:
     # Asgari ücret gelir matrahı
     asgari_gelir_matrahi = asgari_ucret_brut - (asgari_sgk + asgari_issizlik)
 
-    # Asgari ücret gelir vergisi (ilk dilim %15)
+   
     asgari_gelir_vergisi = asgari_gelir_matrahi * 0.15
 
-    # Asgari ücret net hesaplama
+
     asgari_net = asgari_ucret_brut - (asgari_sgk + asgari_issizlik + asgari_gelir_vergisi + asgari_damga_vergisi)
 
-    # İstisnalar
+ 
     asgari_ucret_gelir_vergisi_istisnasi = asgari_gelir_vergisi
     asgari_ucret_damga_vergisi_istisnasi = asgari_damga_vergisi
 
-    # Sabit oranlar
+ 
     sgk_oranı = 0.14
     işsizlik_sigorta_primi = 0.01
     damga_vergisi = 0.00759
 
-    # Vergi dilimleri
+ 
     vergi1 = 158_000 * 0.15
     vergi2 = (330_000 - 158_000) * 0.20
     vergi3 = (1_200_000 - 330_000) * 0.27
@@ -54,13 +53,13 @@ if hesapla_btn and brüt_ücret > 0:
     vergi5 = (800_000 - 330_000) * 0.27
     vergi6 = (4_300_000 - 800_000) * 0.35
 
-    # Kesintiler
+  
     sgk_işçi = brüt_ücret * sgk_oranı
     işsizlik_işçi = brüt_ücret * işsizlik_sigorta_primi
     damga_vergisi_tutarı = brüt_ücret * damga_vergisi
     gelir_matrahı = brüt_ücret - (sgk_işçi + işsizlik_işçi)
 
-    # Hesaplamalar
+   
     toplam_net = 0
     toplam_vergi = 0
     kümülatif_matrah = 0
@@ -69,7 +68,7 @@ if hesapla_btn and brüt_ücret > 0:
     for ay in range(1, 13):
         kümülatif_matrah += gelir_matrahı
 
-        # Vergi hesaplama
+      
         if bordro:
             if kümülatif_matrah < 158_000:
                 kümülatif_vergi = kümülatif_matrah * 0.15
@@ -98,13 +97,13 @@ if hesapla_btn and brüt_ücret > 0:
         else:
             aylık_gelir_vergisi = kümülatif_vergi - toplam_vergi
 
-        # İstisna uygulaması
+        
         gelir_vergisi_istisna_sonrası = max(0, aylık_gelir_vergisi - asgari_ucret_gelir_vergisi_istisnasi)
         damga_vergisi_istisna_sonrası = max(0, damga_vergisi_tutarı - asgari_ucret_damga_vergisi_istisnasi)
 
         toplam_vergi = kümülatif_vergi
 
-        # Net ücret hesaplama
+       
         aylık_net = brüt_ücret - (
                     sgk_işçi + işsizlik_işçi + gelir_vergisi_istisna_sonrası + damga_vergisi_istisna_sonrası)
         toplam_net += aylık_net
@@ -124,16 +123,16 @@ if hesapla_btn and brüt_ücret > 0:
         })
 
 
-    # Sonuçları göster
+    
     df = pd.DataFrame(sonuclar)
     
-    # Excel için sayıları formatlı string'e çevir
+    
     df_display = df.copy()
     for col in ['Brüt Ücret', 'SGK', 'İşsizlik', 'Gelir Vergisi', 'GV İstisnası', 
                 'Ödenecek GV', 'Damga Vergisi', 'DV İstisnası', 'Ödenecek DV', 'Net Ücret']:
         df_display[col] = df[col].apply(lambda x: f'{x:,.2f} ₺')
 
-    # Sütun genişliklerini ayarla
+   
     st.dataframe(
         df_display,
         use_container_width=True,
@@ -155,9 +154,9 @@ if hesapla_btn and brüt_ücret > 0:
     )
     
     
-    # CSV indirme butonu (Excel yerine)
+   
     def to_csv(df):
-        # Formatlanmış veriyi hazırla
+        
         df_csv = df.copy()
         for col in ['Brüt Ücret', 'SGK', 'İşsizlik', 'Gelir Vergisi', 'GV İstisnası', 
                     'Ödenecek GV', 'Damga Vergisi', 'DV İstisnası', 'Ödenecek DV', 'Net Ücret']:
@@ -175,3 +174,4 @@ if hesapla_btn and brüt_ücret > 0:
     )
 
     st.success(f'Yıllık net Ücret: {toplam_net:,.2f} ₺')
+
