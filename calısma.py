@@ -2,6 +2,7 @@ import streamlit as st
 import random
 import string
 import time
+from datetime import datetime
 
 # === Yardımcı Fonksiyonlar ===
 def analyze_password(password):
@@ -63,8 +64,88 @@ def generate_password(strength_level):
 
 # === Streamlit UI ===
 st.set_page_config(page_title="🔐 Güçlü Şifre Aracı", page_icon="🔐", layout="centered")
+
+# Özel CSS - Matrix/Dijital Şelale efekti
+st.markdown("""
+<style>
+    .password-container {
+        background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+        border: 2px solid #00ff41;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 15px 0;
+        box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        animation: glow 2s ease-in-out infinite alternate;
+    }
+    
+    @keyframes glow {
+        from {
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+        to {
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.6);
+        }
+    }
+    
+    .password-text {
+        font-family: 'Courier New', monospace;
+        font-size: 20px;
+        font-weight: bold;
+        color: #00ff41;
+        text-shadow: 0 0 10px #00ff41;
+        letter-spacing: 3px;
+        word-break: break-all;
+        animation: flicker 0.5s infinite alternate;
+    }
+    
+    @keyframes flicker {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.8;
+        }
+    }
+    
+    .timestamp {
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        color: #00ff41;
+        opacity: 0.7;
+        margin-top: 5px;
+    }
+    
+    .strength-info {
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        color: #00ff41;
+        margin-top: 10px;
+    }
+    
+    .divider {
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #00ff41, transparent);
+        margin: 10px 0;
+        animation: slide 2s linear infinite;
+    }
+    
+    @keyframes slide {
+        0% {
+            background-position: -100% 0;
+        }
+        100% {
+            background-position: 100% 0;
+        }
+    }
+</style>
+""", unsafe_allow_html=True)
+
 st.title("🔐 Güçlü Şifre Aracı")
 st.markdown("---")
+
+# Session state başlangıç
+if 'passwords' not in st.session_state:
+    st.session_state.passwords = []
 
 # Mod seçimi
 mode = st.selectbox("Bir seçenek belirleyin:", ["Şifre Gücünü Kontrol Et", "Şifre Oluştur"])
@@ -96,7 +177,11 @@ elif mode == "Şifre Oluştur":
         for i in range(10):
             for p in placeholders:
                 fake = generate_password(strength)
-                p.code("*" * len(fake), language="text")
+                p.markdown(f"""
+                <div class="password-container">
+                    <div class="password-text">{fake}</div>
+                </div>
+                """, unsafe_allow_html=True)
             progress.progress((i + 1) * 10)
             time.sleep(0.1)
         
@@ -104,52 +189,44 @@ elif mode == "Şifre Oluştur":
         for p in placeholders:
             p.empty()
         
-        st.markdown("### ✅ Oluşturulan Şifreler:")
-        
-        # Session state'de şifreleri sakla
-        if 'passwords' not in st.session_state:
-            st.session_state.passwords = []
-        
+        # Yeni şifreler oluştur ve kaydet
         st.session_state.passwords = []
+        
         for i in range(amount):
             password = generate_password(strength)
             score, level = analyze_password(password)
+            creation_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             st.session_state.passwords.append({
                 'password': password,
                 'score': score,
                 'level': level,
-                'index': i
+                'timestamp': creation_time
             })
+    
+    # Oluşturulan şifreleri göster
+    if st.session_state.passwords:
+        st.markdown("### ✅ Oluşturulan Şifreler:")
         
-        # Her şifre için ayrı göster/gizle ve kopyala butonu
-        for pwd_data in st.session_state.passwords:
-            i = pwd_data['index']
+        for idx, pwd_data in enumerate(st.session_state.passwords, 1):
             password = pwd_data['password']
             score = pwd_data['score']
             level = pwd_data['level']
+            timestamp = pwd_data['timestamp']
             
-            col1, col2, col3 = st.columns([3, 1, 1])
+            st.markdown(f"""
+            <div class="password-container">
+                <div style="color: #00ff41; font-size: 16px; margin-bottom: 10px;">
+                    🔐 Şifre #{idx}
+                </div>
+                <div class="password-text">{password}</div>
+                <div class="divider"></div>
+                <div class="timestamp">
+                    🕒 Oluşturulma Zamanı: {timestamp}
+                </div>
+                <div class="strength-info">
+                    💪 Güç: {level}  |  📊 Skor: {score}/8
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             
-            with col1:
-                # Şifre gösterme durumunu kontrol et
-                show_key = f'show_pwd_{i}'
-                if show_key not in st.session_state:
-                    st.session_state[show_key] = False
-                
-                if st.session_state[show_key]:
-                    st.code(password, language="text")
-                else:
-                    st.code("*" * len(password), language="text")
-            
-            with col2:
-                if st.button("👁️ Göster" if not st.session_state[show_key] else "🙈 Gizle", key=f'btn_{i}'):
-                    st.session_state[show_key] = not st.session_state[show_key]
-                    st.rerun()
-            
-            with col3:
-                # Kopyalama için metin göster
-                if st.session_state[show_key]:
-                    st.button("📋 Kopyala", key=f'copy_{i}', help="Şifreyi manuel olarak kopyalayın")
-            
-            st.write(f"**Güç:** {level}  |  **Skor:** {score}/8")
-            st.markdown("---")
+            st.markdown("<br>", unsafe_allow_html=True)
