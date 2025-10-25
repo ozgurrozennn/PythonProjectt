@@ -65,7 +65,7 @@ def generate_password(strength_level):
 # === Streamlit UI ===
 st.set_page_config(page_title="🔐 Güçlü Şifre Aracı", page_icon="🔐", layout="centered")
 
-# Basit siyah arka plan + yeşil dijital tema
+# Siyah arka plan + yeşil dijital tema
 st.markdown("""
 <style>
     /* Siyah arka plan */
@@ -85,26 +85,6 @@ st.markdown("""
         font-family: 'Courier New', monospace !important;
     }
     
-    /* Code blokları - Dijital görünüm */
-    div[data-testid="stCodeBlock"] {
-        background: rgba(0, 20, 0, 0.8) !important;
-        border: 3px solid #00ff41 !important;
-        border-radius: 15px !important;
-        box-shadow: 0 0 25px rgba(0, 255, 65, 0.5) !important;
-        padding: 25px !important;
-    }
-    
-    div[data-testid="stCodeBlock"] code {
-        color: #00ff41 !important;
-        background: transparent !important;
-        padding: 20px !important;
-        font-family: 'Courier New', monospace !important;
-        font-size: 28px !important;
-        font-weight: bold !important;
-        letter-spacing: 8px !important;
-        text-shadow: 0 0 15px #00ff41, 0 0 25px #00ff41 !important;
-    }
-    
     /* Progress bar */
     div[data-testid="stProgressBar"] > div > div {
         background: #00ff41 !important;
@@ -122,45 +102,12 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* Metric kartları */
-    div[data-testid="stMetric"] {
-        background: rgba(0, 20, 0, 0.8) !important;
-        border: 2px solid #00ff41 !important;
-        border-radius: 15px !important;
-        padding: 20px !important;
-        box-shadow: 0 0 20px rgba(0, 255, 65, 0.4) !important;
-    }
-    
-    div[data-testid="stMetric"] label {
-        color: #00ff41 !important;
-        font-weight: bold !important;
-        font-family: 'Courier New', monospace !important;
-        font-size: 16px !important;
-    }
-    
-    div[data-testid="stMetric"] [data-testid="stMetricValue"] {
-        color: #00ff41 !important;
-        font-size: 32px !important;
-        font-weight: bold !important;
-        text-shadow: 0 0 15px #00ff41 !important;
-        font-family: 'Courier New', monospace !important;
-    }
-    
     /* Mesaj kutuları */
     div[data-testid="stAlert"] {
         background: rgba(0, 20, 0, 0.6) !important;
         border: 2px solid #00ff41 !important;
         border-radius: 10px !important;
         font-family: 'Courier New', monospace !important;
-    }
-    
-    /* Caption */
-    .stCaption {
-        color: #00ff41 !important;
-        font-family: 'Courier New', monospace !important;
-        opacity: 0.8 !important;
-        text-align: center !important;
-        font-size: 14px !important;
     }
     
     /* Butonlar */
@@ -225,15 +172,45 @@ if mode == "Şifre Gücünü Kontrol Et":
         if password:
             score, level = analyze_password(password)
             
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            # Şifreyi code bloğunda göster
-            st.code(password, language="text")
-            
-            # Seviyeyi metric ile göster
-            col1, col2, col3 = st.columns([1, 2, 1])
-            with col2:
-                st.metric("Şifre Seviyesi", level)
+            # Container kullanarak HTML render et
+            with st.container():
+                st.markdown(f"""
+                <div style='background: #000000; 
+                            border: 3px solid #00ff41; 
+                            border-radius: 15px; 
+                            padding: 30px; 
+                            margin: 20px 0;
+                            box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);'>
+                    
+                    <div style='background: rgba(0, 20, 0, 0.8); 
+                                border: 2px solid #00ff41; 
+                                border-radius: 10px; 
+                                padding: 25px; 
+                                margin: 15px 0;
+                                box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.2);'>
+                        <p style='color: #00ff41; 
+                                  font-family: Courier New, monospace; 
+                                  font-size: 32px; 
+                                  font-weight: bold; 
+                                  letter-spacing: 8px; 
+                                  text-align: center;
+                                  text-shadow: 0 0 15px #00ff41, 0 0 25px #00ff41;
+                                  margin: 0;'>
+                            {password}
+                        </p>
+                    </div>
+                    
+                    <div style='text-align: center; margin-top: 25px;'>
+                        <div style='color: #00ff41; 
+                                    font-family: Courier New, monospace; 
+                                    font-size: 28px; 
+                                    font-weight: bold;
+                                    text-shadow: 0 0 15px #00ff41;'>
+                            Seviye: {level}
+                        </div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
             
         else:
             st.warning("⚠️ Lütfen önce bir şifre girin.")
@@ -254,15 +231,31 @@ elif mode == "Şifre Oluştur":
             animation_placeholders.append(st.empty())
         
         # Animasyonlu şifre oluşturma gösterimi
-        for frame in range(20):  # 20 kare animasyon
+        for frame in range(20):
             for placeholder in animation_placeholders:
-                # Her karede rastgele şifre göster (hızlı değişim)
                 fake_password = generate_password(strength)
-                with placeholder.container():
-                    st.code(fake_password, language="text")
+                placeholder.markdown(f"""
+                <div style='background: rgba(0, 20, 0, 0.8); 
+                            border: 3px solid #00ff41; 
+                            border-radius: 10px; 
+                            padding: 20px; 
+                            margin: 10px 0;
+                            box-shadow: 0 0 30px rgba(0, 255, 65, 0.6);'>
+                    <p style='color: #00ff41; 
+                              font-family: Courier New, monospace; 
+                              font-size: 22px; 
+                              font-weight: bold; 
+                              letter-spacing: 6px; 
+                              text-align: center;
+                              text-shadow: 0 0 15px #00ff41;
+                              margin: 0;'>
+                        {fake_password}
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
             
             progress_bar.progress((frame + 1) * 5, text=f"⚡ Şifreler oluşturuluyor... {(frame + 1) * 5}%")
-            time.sleep(0.08)  # Hızlı değişim
+            time.sleep(0.08)
         
         # Animasyonu temizle
         progress_bar.empty()
@@ -285,7 +278,7 @@ elif mode == "Şifre Oluştur":
         
         st.success("✅ Şifreler başarıyla oluşturuldu!")
     
-    # Oluşturulan şifreleri göster - Streamlit native komponentleri
+    # Oluşturulan şifreleri göster
     if st.session_state.passwords:
         st.markdown("---")
         st.markdown("### ✅ Oluşturulan Şifreler")
@@ -296,21 +289,62 @@ elif mode == "Şifre Oluştur":
             level = pwd_data['level']
             timestamp = pwd_data['timestamp']
             
-            st.markdown(f"#### 🔐 Şifre #{idx}")
-            
-            # Şifreyi code bloğunda göster
-            st.code(password, language="text")
-            
-            # Bilgileri metrics ile göster
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Seviye", level)
-            with col2:
-                st.metric("Uzunluk", f"{len(password)}")
-            with col3:
-                st.metric("Skor", f"{score}/8")
-            
-            # Zaman bilgisi
-            st.caption(f"🕒 {timestamp}")
-            
-            st.markdown("---")
+            # Her şifre için container kullan
+            with st.container():
+                st.markdown(f"""
+                <div style='background: #000000; 
+                            border: 3px solid #00ff41; 
+                            border-radius: 15px; 
+                            padding: 25px; 
+                            margin: 20px 0;
+                            box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);'>
+                    
+                    <div style='text-align: center; margin-bottom: 20px;'>
+                        <span style='color: #00ff41; 
+                                     font-family: Courier New, monospace; 
+                                     font-size: 22px; 
+                                     font-weight: bold;
+                                     text-shadow: 0 0 10px #00ff41;'>
+                            🔐 Şifre #{idx}
+                        </span>
+                    </div>
+                    
+                    <div style='background: rgba(0, 20, 0, 0.8); 
+                                border: 2px solid #00ff41; 
+                                border-radius: 10px; 
+                                padding: 20px; 
+                                margin: 15px 0;
+                                box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.2);'>
+                        <p style='color: #00ff41; 
+                                  font-family: Courier New, monospace; 
+                                  font-size: 28px; 
+                                  font-weight: bold; 
+                                  letter-spacing: 8px; 
+                                  text-align: center;
+                                  text-shadow: 0 0 15px #00ff41, 0 0 25px #00ff41;
+                                  margin: 0;'>
+                            {password}
+                        </p>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-around; margin: 20px 0;'>
+                        <div style='text-align: center;'>
+                            <div style='color: #00ff41; font-family: Courier New; font-size: 14px; opacity: 0.8;'>Seviye</div>
+                            <div style='color: #00ff41; font-family: Courier New; font-size: 24px; font-weight: bold; text-shadow: 0 0 10px #00ff41;'>{level}</div>
+                        </div>
+                        <div style='text-align: center;'>
+                            <div style='color: #00ff41; font-family: Courier New; font-size: 14px; opacity: 0.8;'>Uzunluk</div>
+                            <div style='color: #00ff41; font-family: Courier New; font-size: 24px; font-weight: bold; text-shadow: 0 0 10px #00ff41;'>{len(password)}</div>
+                        </div>
+                    </div>
+                    
+                    <div style='text-align: center; margin-top: 15px;'>
+                        <span style='color: #00ff41; 
+                                     font-family: Courier New, monospace; 
+                                     font-size: 13px; 
+                                     opacity: 0.8;'>
+                            🕒 {timestamp}
+                        </span>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
