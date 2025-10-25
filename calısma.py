@@ -2,9 +2,6 @@ import streamlit as st
 import random
 import string
 import time
-import qrcode
-from io import BytesIO
-from PIL import Image
 
 # === Yardımcı Fonksiyonlar ===
 def analyze_password(password):
@@ -63,24 +60,6 @@ def generate_password(strength_level):
         pool = lower + upper + digits + symbols
     
     return ''.join(random.choice(pool) for _ in range(length))
-
-def create_qr_code(text):
-    """Verilen metin için QR kod oluşturur."""
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
-    )
-    qr.add_data(text)
-    qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
-    
-    # PIL Image'ı BytesIO buffer'a dönüştür
-    buf = BytesIO()
-    img.save(buf, format='PNG')
-    buf.seek(0)
-    return buf
 
 # === Streamlit UI ===
 st.set_page_config(page_title="🔐 Güçlü Şifre Aracı", page_icon="🔐", layout="centered")
@@ -142,7 +121,7 @@ elif mode == "Şifre Oluştur":
                 'index': i
             })
         
-        # Her şifre için ayrı göster/gizle butonu
+        # Her şifre için ayrı göster/gizle ve kopyala butonu
         for pwd_data in st.session_state.passwords:
             i = pwd_data['index']
             password = pwd_data['password']
@@ -168,15 +147,9 @@ elif mode == "Şifre Oluştur":
                     st.rerun()
             
             with col3:
-                # QR kod oluştur
-                qr_buffer = create_qr_code(password)
-                st.download_button(
-                    label="📱 QR",
-                    data=qr_buffer,
-                    file_name=f"sifre_qr_{i+1}.png",
-                    mime="image/png",
-                    key=f'qr_{i}'
-                )
+                # Kopyalama için metin göster
+                if st.session_state[show_key]:
+                    st.button("📋 Kopyala", key=f'copy_{i}', help="Şifreyi manuel olarak kopyalayın")
             
             st.write(f"**Güç:** {level}  |  **Skor:** {score}/8")
             st.markdown("---")
