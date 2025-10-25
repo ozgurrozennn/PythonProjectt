@@ -28,11 +28,15 @@ def analyze_password(password):
     if any(c in string.punctuation for c in password):
         score += 2
     
-    # Güç seviyesini belirle (sadece Orta ve Güçlü)
-    if score <= 5:
-        level = "🟡 Orta"
+    # Güç seviyesini belirle
+    if score <= 3:
+        level = "Zayıf"
+    elif score <= 5:
+        level = "Orta"
+    elif score <= 7:
+        level = "Güçlü"
     else:
-        level = "🟢 Güçlü"
+        level = "Çok Güçlü"
     
     return score, level
 
@@ -237,16 +241,47 @@ if mode == "Şifre Gücünü Kontrol Et":
     if st.button("🔎 Kontrol Et", use_container_width=True, type="primary"):
         if password:
             score, level = analyze_password(password)
-            percentage = (score / 8) * 100
             
             st.markdown("<br>", unsafe_allow_html=True)
             
-            # Sadece sonuç göster
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric("Seviye", level)
-            with col2:
-                st.metric("Skor", f"{score}/8")
+            # Şifreyi ve seviyeyi göster
+            st.markdown(f"""
+            <div style='background: #000000; 
+                        border: 3px solid #00ff41; 
+                        border-radius: 15px; 
+                        padding: 30px; 
+                        margin: 20px 0;
+                        box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);'>
+                
+                <div style='background: rgba(0, 20, 0, 0.8); 
+                            border: 2px solid #00ff41; 
+                            border-radius: 10px; 
+                            padding: 25px; 
+                            margin: 15px 0;
+                            box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.2);'>
+                    <p style='color: #00ff41; 
+                              font-family: Courier New, monospace; 
+                              font-size: 32px; 
+                              font-weight: bold; 
+                              letter-spacing: 8px; 
+                              text-align: center;
+                              text-shadow: 0 0 15px #00ff41, 0 0 25px #00ff41;
+                              margin: 0;'>
+                        {password}
+                    </p>
+                </div>
+                
+                <div style='text-align: center; margin-top: 25px;'>
+                    <div style='color: #00ff41; 
+                                font-family: Courier New, monospace; 
+                                font-size: 28px; 
+                                font-weight: bold;
+                                text-shadow: 0 0 15px #00ff41;'>
+                        Seviye: {level}
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             
         else:
             st.warning("⚠️ Lütfen önce bir şifre girin.")
@@ -326,7 +361,6 @@ elif mode == "Şifre Oluştur":
             score = pwd_data['score']
             level = pwd_data['level']
             timestamp = pwd_data['timestamp']
-            percentage = (score / 8) * 100
             
             # Dijital yeşil ve siyah görünüm
             st.markdown(f"""
@@ -368,15 +402,11 @@ elif mode == "Şifre Oluştur":
                 <div style='display: flex; justify-content: space-around; margin: 20px 0;'>
                     <div style='text-align: center;'>
                         <div style='color: #00ff41; font-family: Courier New; font-size: 14px; opacity: 0.8;'>Seviye</div>
-                        <div style='color: #00ff41; font-family: Courier New; font-size: 20px; font-weight: bold; text-shadow: 0 0 8px #00ff41;'>{level}</div>
-                    </div>
-                    <div style='text-align: center;'>
-                        <div style='color: #00ff41; font-family: Courier New; font-size: 14px; opacity: 0.8;'>Skor</div>
-                        <div style='color: #00ff41; font-family: Courier New; font-size: 20px; font-weight: bold; text-shadow: 0 0 8px #00ff41;'>{score}/8</div>
+                        <div style='color: #00ff41; font-family: Courier New; font-size: 24px; font-weight: bold; text-shadow: 0 0 10px #00ff41;'>{level}</div>
                     </div>
                     <div style='text-align: center;'>
                         <div style='color: #00ff41; font-family: Courier New; font-size: 14px; opacity: 0.8;'>Uzunluk</div>
-                        <div style='color: #00ff41; font-family: Courier New; font-size: 20px; font-weight: bold; text-shadow: 0 0 8px #00ff41;'>{len(password)}</div>
+                        <div style='color: #00ff41; font-family: Courier New; font-size: 24px; font-weight: bold; text-shadow: 0 0 10px #00ff41;'>{len(password)}</div>
                     </div>
                 </div>
                 
