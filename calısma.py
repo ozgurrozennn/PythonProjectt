@@ -2,23 +2,25 @@ import streamlit as st
 import random
 import string
 import time
+import qrcode
+from io import BytesIO
+from PIL import Image
 
-# === Helper Functions ===
-
+# === Yardımcı Fonksiyonlar ===
 def analyze_password(password):
-    """Analyze the strength of a given password."""
+    """Şifrenin gücünü analiz eder."""
     score = 0
     length = len(password)
-
-    # Length score
+    
+    # Uzunluk skoru
     if length >= 16:
         score += 3
     elif length >= 12:
         score += 2
     elif length >= 8:
         score += 1
-
-    # Character type checks
+    
+    # Karakter türü kontrolleri
     if any(c.islower() for c in password):
         score += 1
     if any(c.isupper() for c in password):
@@ -27,88 +29,154 @@ def analyze_password(password):
         score += 1
     if any(c in string.punctuation for c in password):
         score += 2
-
-    # Determine strength level
+    
+    # Güç seviyesini belirle
     if score <= 3:
-        level = "🔴 Weak"
+        level = "🔴 Zayıf"
     elif score <= 5:
-        level = "🟡 Medium"
+        level = "🟡 Orta"
     elif score <= 7:
-        level = "🟢 Strong"
+        level = "🟢 Güçlü"
     else:
-        level = "🟢 Very Strong"
-
+        level = "🟢 Çok Güçlü"
+    
     return score, level
 
-
 def generate_password(strength_level):
-    """Generate a password based on selected strength level."""
+    """Seçilen güç seviyesine göre şifre oluşturur."""
     lower = string.ascii_lowercase
     upper = string.ascii_uppercase
     digits = string.digits
     symbols = string.punctuation
-
-    if strength_level == "Weak":
+    
+    if strength_level == "Zayıf":
         length = 8
         pool = lower + upper + digits
-    elif strength_level == "Medium":
+    elif strength_level == "Orta":
         length = 12
         pool = lower + upper + digits + symbols
-    elif strength_level == "Strong":
+    elif strength_level == "Güçlü":
         length = 16
         pool = lower + upper + digits + symbols
-    else:
+    else:  # Çok Güçlü
         length = 20
         pool = lower + upper + digits + symbols
-
+    
     return ''.join(random.choice(pool) for _ in range(length))
 
+def create_qr_code(text):
+    """Verilen metin için QR kod oluşturur."""
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(text)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    # PIL Image'ı BytesIO buffer'a dönüştür
+    buf = BytesIO()
+    img.save(buf, format='PNG')
+    buf.seek(0)
+    return buf
 
 # === Streamlit UI ===
-
-st.set_page_config(page_title=" Strong Password Tool", page_icon="", layout="centered")
-
-st.title("Strong Password Tool")
+st.set_page_config(page_title="🔐 Güçlü Şifre Aracı", page_icon="🔐", layout="centered")
+st.title("🔐 Güçlü Şifre Aracı")
 st.markdown("---")
 
-# Mode selection
-mode = st.selectbox("Select an option:", ["Check Password Strength", "Generate Passwords"])
+# Mod seçimi
+mode = st.selectbox("Bir seçenek belirleyin:", ["Şifre Gücünü Kontrol Et", "Şifre Oluştur"])
 
-# === PASSWORD CHECK MODE ===
-if mode == "Check Password Strength":
-    st.subheader(" Password Strength Checker")
-    password = st.text_input("Enter your password:", type="password", placeholder="Type your password here...")
-
-    if st.button("Check"):
+# === ŞİFRE KONTROL MODU ===
+if mode == "Şifre Gücünü Kontrol Et":
+    st.subheader("🔍 Şifre Gücü Kontrolü")
+    password = st.text_input("Şifrenizi girin:", type="password", placeholder="Şifrenizi buraya yazın...")
+    
+    if st.button("Kontrol Et"):
         if password:
             score, level = analyze_password(password)
-            st.success(f"**Result:** {level}  |  **Score:** {score}/8")
+            st.success(f"**Sonuç:** {level}  |  **Skor:** {score}/8")
         else:
-            st.warning(" Please enter a password first.")
+            st.warning("⚠️ Lütfen önce bir şifre girin.")
 
-# === PASSWORD GENERATION MODE ===
-elif mode == "Generate Passwords":
-    st.subheader("Automatic Password Generator")
-
-    strength = st.selectbox("Select password strength:", ["Weak", "Medium", "Strong", "Very Strong"])
-    amount = st.slider("How many passwords do you want to generate?", 1, 10, 3)
-
-    if st.button("Generate"):
+# === ŞİFRE OLUŞTURMA MODU ===
+elif mode == "Şifre Oluştur":
+    st.subheader("🎲 Otomatik Şifre Oluşturucu")
+    
+    strength = st.selectbox("Şifre gücünü seçin:", ["Zayıf", "Orta", "Güçlü", "Çok Güçlü"])
+    amount = st.slider("Kaç adet şifre oluşturmak istiyorsunuz?", 1, 10, 3)
+    
+    if st.button("Oluştur"):
         progress = st.progress(0)
         placeholders = [st.empty() for _ in range(amount)]
-
-        # Animated fake passwords
+        
+        # Animasyonlu sahte şifreler
         for i in range(10):
             for p in placeholders:
                 fake = generate_password(strength)
-                p.code(fake, language="text")
+                p.code("*" * len(fake), language="text")
             progress.progress((i + 1) * 10)
             time.sleep(0.1)
-
+        
         progress.empty()
-        st.markdown("###  Generated Passwords:")
+        for p in placeholders:
+            p.empty()
+        
+        st.markdown("### ✅ Oluşturulan Şifreler:")
+        
+        # Session state'de şifreleri sakla
+        if 'passwords' not in st.session_state:
+            st.session_state.passwords = []
+        
+        st.session_state.passwords = []
         for i in range(amount):
             password = generate_password(strength)
             score, level = analyze_password(password)
-            st.code(password, language="text")
-            st.write(f"**Strength:** {level}  |  **Score:** {score}/8")
+            st.session_state.passwords.append({
+                'password': password,
+                'score': score,
+                'level': level,
+                'index': i
+            })
+        
+        # Her şifre için ayrı göster/gizle butonu
+        for pwd_data in st.session_state.passwords:
+            i = pwd_data['index']
+            password = pwd_data['password']
+            score = pwd_data['score']
+            level = pwd_data['level']
+            
+            col1, col2, col3 = st.columns([3, 1, 1])
+            
+            with col1:
+                # Şifre gösterme durumunu kontrol et
+                show_key = f'show_pwd_{i}'
+                if show_key not in st.session_state:
+                    st.session_state[show_key] = False
+                
+                if st.session_state[show_key]:
+                    st.code(password, language="text")
+                else:
+                    st.code("*" * len(password), language="text")
+            
+            with col2:
+                if st.button("👁️ Göster" if not st.session_state[show_key] else "🙈 Gizle", key=f'btn_{i}'):
+                    st.session_state[show_key] = not st.session_state[show_key]
+                    st.rerun()
+            
+            with col3:
+                # QR kod oluştur
+                qr_buffer = create_qr_code(password)
+                st.download_button(
+                    label="📱 QR",
+                    data=qr_buffer,
+                    file_name=f"sifre_qr_{i+1}.png",
+                    mime="image/png",
+                    key=f'qr_{i}'
+                )
+            
+            st.write(f"**Güç:** {level}  |  **Skor:** {score}/8")
+            st.markdown("---")
