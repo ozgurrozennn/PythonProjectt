@@ -9,61 +9,32 @@ def analyze_password(password):
     """Şifrenin gücünü analiz eder."""
     score = 0
     length = len(password)
-    feedback = []
     
     # Uzunluk skoru
     if length >= 16:
         score += 3
-        feedback.append("✓ Mükemmel uzunluk")
     elif length >= 12:
         score += 2
-        feedback.append("✓ İyi uzunluk")
     elif length >= 8:
         score += 1
-        feedback.append("⚠ Orta uzunluk")
-    else:
-        feedback.append("✗ Çok kısa")
     
     # Karakter türü kontrolleri
     if any(c.islower() for c in password):
         score += 1
-        feedback.append("✓ Küçük harf")
-    else:
-        feedback.append("✗ Küçük harf yok")
-        
     if any(c.isupper() for c in password):
         score += 1
-        feedback.append("✓ Büyük harf")
-    else:
-        feedback.append("✗ Büyük harf yok")
-        
     if any(c.isdigit() for c in password):
         score += 1
-        feedback.append("✓ Rakam")
-    else:
-        feedback.append("✗ Rakam yok")
-        
     if any(c in string.punctuation for c in password):
         score += 2
-        feedback.append("✓ Özel karakter")
-    else:
-        feedback.append("✗ Özel karakter yok")
     
-    # Güç seviyesini belirle
-    if score <= 3:
-        level = "🔴 Zayıf"
-        recommendation = "Bu şifre çok zayıf! Daha uzun ve karmaşık bir şifre kullanın."
-    elif score <= 5:
+    # Güç seviyesini belirle (sadece Orta ve Güçlü)
+    if score <= 5:
         level = "🟡 Orta"
-        recommendation = "Bu şifre orta seviyede. Özel karakterler ekleyerek güçlendirebilirsiniz."
-    elif score <= 7:
-        level = "🟢 Güçlü"
-        recommendation = "Bu şifre güçlü! Güvenle kullanabilirsiniz."
     else:
-        level = "🟢 Çok Güçlü"
-        recommendation = "Mükemmel! Bu şifre çok güçlü ve güvenli."
+        level = "🟢 Güçlü"
     
-    return score, level, feedback, recommendation
+    return score, level
 
 def generate_password(strength_level):
     """Seçilen güç seviyesine göre şifre oluşturur."""
@@ -178,21 +149,24 @@ st.markdown("""
         font-family: 'Courier New', monospace !important;
     }
     
-    /* Expander kutuları */
+    /* Expander kutuları - Dijital görünüm */
     div[data-testid="stExpander"] {
-        background: rgba(0, 20, 0, 0.6) !important;
-        border: 2px solid #00ff41 !important;
-        border-radius: 10px !important;
-        box-shadow: 0 0 20px rgba(0, 255, 65, 0.3) !important;
+        background: #000000 !important;
+        border: 3px solid #00ff41 !important;
+        border-radius: 15px !important;
+        box-shadow: 0 0 25px rgba(0, 255, 65, 0.5) !important;
         margin: 15px 0 !important;
     }
     
     div[data-testid="stExpander"] summary {
         color: #00ff41 !important;
         font-weight: bold !important;
-        font-size: 18px !important;
-        text-shadow: 0 0 8px #00ff41 !important;
+        font-size: 20px !important;
+        text-shadow: 0 0 10px #00ff41 !important;
         font-family: 'Courier New', monospace !important;
+        background: rgba(0, 20, 0, 0.8) !important;
+        padding: 15px !important;
+        border-radius: 10px !important;
     }
     
     /* Caption */
@@ -242,29 +216,6 @@ st.markdown("""
         border-color: #00ff41 !important;
         box-shadow: 0 0 10px #00ff41 !important;
     }
-    
-    /* SADECE ANİMASYON SIRASINDA KULLANILAN SINIF */
-    .generating-animation {
-        animation: digitalFlicker 0.1s infinite, borderPulse 0.5s ease-in-out infinite !important;
-    }
-    
-    @keyframes digitalFlicker {
-        0%, 100% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.85;
-        }
-    }
-    
-    @keyframes borderPulse {
-        0%, 100% {
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
-        }
-        50% {
-            box-shadow: 0 0 40px rgba(0, 255, 65, 1);
-        }
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -283,45 +234,19 @@ if mode == "Şifre Gücünü Kontrol Et":
     st.subheader("🔍 Şifre Gücü Kontrolü")
     password = st.text_input("Şifrenizi girin:", type="password", placeholder="Şifrenizi buraya yazın...")
     
-    if st.button("🔎 Analiz Et", use_container_width=True, type="primary"):
+    if st.button("🔎 Kontrol Et", use_container_width=True, type="primary"):
         if password:
-            score, level, feedback, recommendation = analyze_password(password)
+            score, level = analyze_password(password)
             percentage = (score / 8) * 100
             
             st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown("## 🔐 ŞİFRE ANALİZ SONUCU")
-            st.markdown("---")
             
-            st.code("●" * len(password), language="text")
-            st.progress(percentage / 100, text=f"Güç Skoru: {percentage:.0f}%")
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            col1, col2, col3 = st.columns(3)
+            # Sadece sonuç göster
+            col1, col2 = st.columns(2)
             with col1:
                 st.metric("Seviye", level)
             with col2:
                 st.metric("Skor", f"{score}/8")
-            with col3:
-                st.metric("Yüzde", f"{percentage:.0f}%")
-            
-            st.markdown("---")
-            st.markdown("### 📋 Analiz Detayları")
-            for item in feedback:
-                if "✓" in item:
-                    st.success(item)
-                elif "✗" in item:
-                    st.error(item)
-                else:
-                    st.warning(item)
-            
-            st.markdown("---")
-            st.info(f"💡 **Öneri:** {recommendation}")
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.caption(f"🕒 Kontrol Zamanı: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-            with col2:
-                st.caption(f"📏 Uzunluk: {len(password)} karakter")
             
         else:
             st.warning("⚠️ Lütfen önce bir şifre girin.")
@@ -380,7 +305,7 @@ elif mode == "Şifre Oluştur":
         
         for i in range(amount):
             password = generate_password(strength)
-            score, level, feedback, recommendation = analyze_password(password)
+            score, level = analyze_password(password)
             creation_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             st.session_state.passwords.append({
                 'password': password,
@@ -391,7 +316,7 @@ elif mode == "Şifre Oluştur":
         
         st.success("✅ Şifreler başarıyla oluşturuldu!")
     
-    # Oluşturulan şifreleri göster (statik, animasyon yok)
+    # Oluşturulan şifreleri göster - Siyah ve yeşil dijital stil
     if st.session_state.passwords:
         st.markdown("---")
         st.markdown("### ✅ Oluşturulan Şifreler")
@@ -403,17 +328,65 @@ elif mode == "Şifre Oluştur":
             timestamp = pwd_data['timestamp']
             percentage = (score / 8) * 100
             
-            with st.expander(f"🔐 Şifre #{idx} - {level}", expanded=True):
-                st.code(password, language="text")
-                st.progress(percentage / 100, text=f"Güç: {percentage:.0f}%")
-                st.markdown("<br>", unsafe_allow_html=True)
+            # Dijital yeşil ve siyah görünüm
+            st.markdown(f"""
+            <div style='background: #000000; 
+                        border: 3px solid #00ff41; 
+                        border-radius: 15px; 
+                        padding: 25px; 
+                        margin: 20px 0;
+                        box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);'>
                 
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("Seviye", level)
-                with col2:
-                    st.metric("Skor", f"{score}/8")
-                with col3:
-                    st.metric("Uzunluk", f"{len(password)}")
+                <div style='text-align: center; margin-bottom: 20px;'>
+                    <span style='color: #00ff41; 
+                                 font-family: Courier New, monospace; 
+                                 font-size: 22px; 
+                                 font-weight: bold;
+                                 text-shadow: 0 0 10px #00ff41;'>
+                        🔐 Şifre #{idx}
+                    </span>
+                </div>
                 
-                st.caption(f"🕒 Oluşturulma: {timestamp}")
+                <div style='background: rgba(0, 20, 0, 0.8); 
+                            border: 2px solid #00ff41; 
+                            border-radius: 10px; 
+                            padding: 20px; 
+                            margin: 15px 0;
+                            box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.2);'>
+                    <p style='color: #00ff41; 
+                              font-family: Courier New, monospace; 
+                              font-size: 28px; 
+                              font-weight: bold; 
+                              letter-spacing: 8px; 
+                              text-align: center;
+                              text-shadow: 0 0 15px #00ff41, 0 0 25px #00ff41;
+                              margin: 0;'>
+                        {password}
+                    </p>
+                </div>
+                
+                <div style='display: flex; justify-content: space-around; margin: 20px 0;'>
+                    <div style='text-align: center;'>
+                        <div style='color: #00ff41; font-family: Courier New; font-size: 14px; opacity: 0.8;'>Seviye</div>
+                        <div style='color: #00ff41; font-family: Courier New; font-size: 20px; font-weight: bold; text-shadow: 0 0 8px #00ff41;'>{level}</div>
+                    </div>
+                    <div style='text-align: center;'>
+                        <div style='color: #00ff41; font-family: Courier New; font-size: 14px; opacity: 0.8;'>Skor</div>
+                        <div style='color: #00ff41; font-family: Courier New; font-size: 20px; font-weight: bold; text-shadow: 0 0 8px #00ff41;'>{score}/8</div>
+                    </div>
+                    <div style='text-align: center;'>
+                        <div style='color: #00ff41; font-family: Courier New; font-size: 14px; opacity: 0.8;'>Uzunluk</div>
+                        <div style='color: #00ff41; font-family: Courier New; font-size: 20px; font-weight: bold; text-shadow: 0 0 8px #00ff41;'>{len(password)}</div>
+                    </div>
+                </div>
+                
+                <div style='text-align: center; margin-top: 15px;'>
+                    <span style='color: #00ff41; 
+                                 font-family: Courier New, monospace; 
+                                 font-size: 13px; 
+                                 opacity: 0.8;'>
+                        🕒 {timestamp}
+                    </span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
