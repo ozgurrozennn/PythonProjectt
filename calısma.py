@@ -90,27 +90,124 @@ def generate_password(strength_level):
 # === Streamlit UI ===
 st.set_page_config(page_title="🔐 Güçlü Şifre Aracı", page_icon="🔐", layout="centered")
 
-# Basit arka plan CSS
+# Matrix yeşili CSS - Beyaz arka plan
 st.markdown("""
 <style>
+    /* Beyaz arka plan */
     .stApp {
-        background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+        background-color: #ffffff;
     }
     
-    /* Metinleri yeşil yap */
-    .stMarkdown, .stText {
-        color: #00ff41 !important;
+    /* Code blokları - Matrix yeşili dijital görünüm */
+    div[data-testid="stCodeBlock"] {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%) !important;
+        border: 3px solid #00ff41 !important;
+        border-radius: 15px !important;
+        box-shadow: 0 0 30px rgba(0, 255, 65, 0.4), inset 0 0 20px rgba(0, 255, 65, 0.1) !important;
+        padding: 20px !important;
     }
     
-    /* Code blokları için */
-    code {
+    div[data-testid="stCodeBlock"] code {
         color: #00ff41 !important;
-        background-color: rgba(0, 0, 0, 0.5) !important;
-        padding: 10px !important;
-        border-radius: 5px !important;
+        background: rgba(0, 0, 0, 0.8) !important;
+        padding: 20px !important;
+        border-radius: 10px !important;
         font-family: 'Courier New', monospace !important;
-        letter-spacing: 3px !important;
+        font-size: 24px !important;
+        font-weight: bold !important;
+        letter-spacing: 8px !important;
+        text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41 !important;
+    }
+    
+    /* Progress bar - Matrix yeşili */
+    div[data-testid="stProgressBar"] > div > div {
+        background-color: #00ff41 !important;
+        box-shadow: 0 0 20px #00ff41 !important;
+    }
+    
+    div[data-testid="stProgressBar"] > div {
+        background-color: #e8f5e9 !important;
+        border: 2px solid #00ff41 !important;
+        border-radius: 10px !important;
+    }
+    
+    /* Metric kartları */
+    div[data-testid="stMetric"] {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%) !important;
+        border: 2px solid #00ff41 !important;
+        border-radius: 10px !important;
+        padding: 15px !important;
+        box-shadow: 0 0 15px rgba(0, 255, 65, 0.3) !important;
+    }
+    
+    div[data-testid="stMetric"] label {
+        color: #2e7d32 !important;
+        font-weight: bold !important;
+    }
+    
+    div[data-testid="stMetric"] [data-testid="stMetricValue"] {
+        color: #00ff41 !important;
+        font-size: 28px !important;
+        font-weight: bold !important;
+        text-shadow: 0 0 5px #00ff41 !important;
+    }
+    
+    /* Success/Error/Warning mesajları */
+    div[data-testid="stAlert"] {
+        border-radius: 10px !important;
+        border-left: 5px solid !important;
+        font-family: 'Courier New', monospace !important;
+        font-weight: bold !important;
+    }
+    
+    /* Expander - Matrix kutu */
+    div[data-testid="stExpander"] {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%) !important;
+        border: 3px solid #00ff41 !important;
+        border-radius: 15px !important;
+        box-shadow: 0 0 25px rgba(0, 255, 65, 0.3) !important;
+        margin: 15px 0 !important;
+    }
+    
+    div[data-testid="stExpander"] summary {
+        color: #00ff41 !important;
+        font-weight: bold !important;
         font-size: 18px !important;
+        text-shadow: 0 0 5px #00ff41 !important;
+    }
+    
+    /* Başlıklar */
+    h1, h2, h3 {
+        color: #00ff41 !important;
+        text-shadow: 0 0 10px #00ff41 !important;
+        font-family: 'Courier New', monospace !important;
+    }
+    
+    /* Caption metinleri */
+    .stCaption {
+        color: #2e7d32 !important;
+        font-family: 'Courier New', monospace !important;
+    }
+    
+    /* Butonlar */
+    button[kind="primary"] {
+        background: linear-gradient(135deg, #00ff41 0%, #00e676 100%) !important;
+        color: black !important;
+        font-weight: bold !important;
+        border: none !important;
+        box-shadow: 0 0 20px rgba(0, 255, 65, 0.5) !important;
+    }
+    
+    button[kind="primary"]:hover {
+        box-shadow: 0 0 30px rgba(0, 255, 65, 0.8) !important;
+        transform: scale(1.02) !important;
+    }
+    
+    /* Info box */
+    div[data-testid="stAlert"][data-baseweb="notification"] {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%) !important;
+        border: 2px solid #00ff41 !important;
+        color: #2e7d32 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -130,7 +227,7 @@ if mode == "Şifre Gücünü Kontrol Et":
     st.subheader("🔍 Şifre Gücü Kontrolü")
     password = st.text_input("Şifrenizi girin:", type="password", placeholder="Şifrenizi buraya yazın...")
     
-    if st.button("🔎 Analiz Et", use_container_width=True):
+    if st.button("🔎 Analiz Et", use_container_width=True, type="primary"):
         if password:
             score, level, feedback, recommendation = analyze_password(password)
             percentage = (score / 8) * 100
@@ -146,7 +243,9 @@ if mode == "Şifre Gücünü Kontrol Et":
             st.code("●" * len(password), language="text")
             
             # Progress bar
-            st.progress(percentage / 100)
+            st.progress(percentage / 100, text=f"Güç Skoru: {percentage:.0f}%")
+            
+            st.markdown("<br>", unsafe_allow_html=True)
             
             # Sonuç metrikleri
             col1, col2, col3 = st.columns(3)
@@ -191,14 +290,13 @@ elif mode == "Şifre Oluştur":
     strength = st.selectbox("Şifre gücünü seçin:", ["Zayıf", "Orta", "Güçlü", "Çok Güçlü"])
     amount = st.slider("Kaç adet şifre oluşturmak istiyorsunuz?", 1, 10, 3)
     
-    if st.button("⚡ Oluştur", use_container_width=True):
+    if st.button("⚡ Oluştur", use_container_width=True, type="primary"):
         # Animasyon
         progress_bar = st.progress(0)
         status_text = st.empty()
         
         for i in range(100):
-            progress_bar.progress(i + 1)
-            status_text.text(f"⚡ Şifreler oluşturuluyor... {i + 1}%")
+            progress_bar.progress(i + 1, text=f"⚡ Şifreler oluşturuluyor... {i + 1}%")
             time.sleep(0.015)
         
         progress_bar.empty()
@@ -237,7 +335,9 @@ elif mode == "Şifre Oluştur":
                 st.code(password, language="text")
                 
                 # Progress bar
-                st.progress(percentage / 100)
+                st.progress(percentage / 100, text=f"Güç: {percentage:.0f}%")
+                
+                st.markdown("<br>", unsafe_allow_html=True)
                 
                 # Bilgiler
                 col1, col2, col3 = st.columns(3)
