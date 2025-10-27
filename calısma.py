@@ -2,7 +2,12 @@
 #import hashlib
 #sifre="1453"
 #x=hashlib.sha256(sifre.encode()).hexdigest()
+#x=hashlib.md5(sifre.encode()).hexdigest()
 #print(x)
+#kriptoloji
+#erlang
+#webrtc
+
 
 
 import random
@@ -47,4 +52,5 @@ random.shuffle(sifre)
 sifre = "".join(sifre)
 
 print(sifre)
+
 
