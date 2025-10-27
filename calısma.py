@@ -1,3 +1,10 @@
+#p2p mesajlasma kodu
+#import hashlib
+#sifre="1453"
+#x=hashlib.sha256(sifre.encode()).hexdigest()
+#print(x)
+
+
 import random
 import string
 import streamlite as st
@@ -40,3 +47,4 @@ random.shuffle(sifre)
 sifre = "".join(sifre)
 
 print(sifre)
+
