@@ -6,7 +6,7 @@ Birden fazla kişi bağlanabilir, herkes herkese mesaj atabilir
 import socket
 import threading
 import time
-
+import streamlite
 class GrupChatSunucu:
     def __init__(self):
         self.istemciler = []  # Bağlı kullanıcılar
@@ -102,3 +102,4 @@ if __name__ == "__main__":
         print("\n\n🛑 Sunucu kapatıldı")
     except Exception as e:
         print(f"\n❌ HATA: {e}")
+
